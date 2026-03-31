@@ -1,0 +1,680 @@
+Skip to content
+issakhambaye0804-star
+NetDB-RK
+Repository navigation
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security and quality
+Insights
+Settings
+Files
+Go to file
+t
+Dockerfile
+README.md
+app.py
+docker-compose.yml
+index.html
+requirements.txt
+NetDB-RK
+/index.html
+issakhambaye0804-star
+issakhambaye0804-star
+Add files via upload
+e2dd562
+ · 
+5 minutes ago
+
+Code
+
+Blame
+645 lines (578 loc) · 24 KB
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetDB-RK | Gestion de Parc Centralisée</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Roboto Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a8a8a8;
+            --accent-green: #00ff41;
+            --accent-orange: #ff6b35;
+            --accent-red: #ff0040;
+            --border-color: #2a2a4e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .navbar-custom {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-green) !important;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(15, 52, 96, 0.3);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 52, 96, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-green);
+            box-shadow: 0 4px 12px rgba(0, 255, 65, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .table-container {
+            background: rgba(15, 52, 96, 0.3);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--accent-green), #00cc33);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+            color: var(--bg-primary);
+        }
+
+        .table-custom {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .table-custom thead th {
+            background: rgba(26, 26, 46, 0.8);
+            color: var(--accent-green);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border: none;
+            padding: 1rem;
+        }
+
+        .table-custom tbody td {
+            border-color: var(--border-color);
+            padding: 0.8rem 1rem;
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr {
+            background: rgba(15, 52, 96, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .table-custom tbody tr:hover {
+            background: rgba(15, 52, 96, 0.5);
+            transform: translateX(2px);
+        }
+
+        .badge-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-actif {
+            background: rgba(0, 255, 65, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .badge-maintenance {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--accent-orange);
+            border: 1px solid var(--accent-orange);
+        }
+
+        .badge-hors-service {
+            background: rgba(255, 0, 64, 0.2);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            margin: 0 0.2rem;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-edit:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .btn-delete:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .modal-header {
+            background: rgba(26, 26, 46, 0.8);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background: rgba(15, 52, 96, 0.5);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 6px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 52, 96, 0.7);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 0.2rem rgba(0, 255, 65, 0.1);
+            color: var(--text-primary);
+        }
+
+        .footer-custom {
+            background: rgba(26, 26, 46, 0.95);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .highlight-new {
+            animation: highlightNew 3s ease-in-out;
+        }
+
+        @keyframes highlightNew {
+            0% { background: rgba(0, 255, 65, 0.3); }
+            100% { background: transparent; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .table-container {
+                padding: 1rem;
+            }
+            
+            .table-custom {
+                font-size: 0.85rem;
+            }
+            
+            .btn-action {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-network-wired me-2"></i>NetDB-RK
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="text-secondary me-3">
+                    <i class="fas fa-database me-1"></i>PostgreSQL
+                </span>
+                <span class="text-secondary">
+                    <i class="fas fa-server me-1"></i>Flask
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-desktop me-2"></i>Gestion de Parc Centralisée
+            </h1>
+            <p class="page-subtitle">Supervision et administration des équipements réseau</p>
+        </div>
+
+        <!-- Statistics Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number" id="totalEquipements">{{ equipements|length }}</div>
+                <div class="stat-label">Total Équipements</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="actifsCount">{{ equipements|selectattr('statut', 'equalto', 'Actif')|list|length }}</div>
+                <div class="stat-label">Actifs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="maintenanceCount">{{ equipements|selectattr('statut', 'equalto', 'En Maintenance')|list|length }}</div>
+                <div class="stat-label">En Maintenance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="horsServiceCount">{{ equipements|selectattr('statut', 'equalto', 'Hors Service')|list|length }}</div>
+                <div class="stat-label">Hors Service</div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">
+                    <i class="fas fa-list me-2"></i>Inventaire des Équipements
+                </h2>
+                <button class="btn-add" data-bs-toggle="modal" data-bs-target="#ajoutModal">
+                    <i class="fas fa-plus me-2"></i>Ajouter un Équipement
+                </button>
+            </div>
+
+            {% if equipements %}
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Adresse IP</th>
+                            <th>Emplacement</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipementsTableBody">
+                        {% for equipement in equipements %}
+                        <tr class="equipement-row" data-id="{{ equipement.id }}">
+                            <td><strong>{{ equipement.id }}</strong></td>
+                            <td>
+                                <i class="fas fa-{% if equipement.type == 'Serveur' %}server{% elif equipement.type == 'Switch' %}network-wired{% elif equipement.type == 'Routeur' %}wifi{% else %}desktop{% endif %} me-2"></i>
+                                {{ equipement.nom_equipement }}
+                            </td>
+                            <td>{{ equipement.type }}</td>
+                            <td>
+                                {% if equipement.adresse_ip %}
+                                    <code class="text-success">{{ equipement.adresse_ip }}</code>
+                                {% else %}
+                                    <span class="text-secondary">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ equipement.emplacement or 'N/A' }}</td>
+                            <td>
+                                <span class="badge-status badge-{% if equipement.statut == 'Actif' %}actif{% elif equipement.statut == 'En Maintenance' %}maintenance{% else %}hors-service{% endif %}">
+                                    {{ equipement.statut }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn-action btn-edit" onclick="modifierEquipement({{ equipement.id }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-action btn-delete" onclick="supprimerEquipement({{ equipement.id }}, '{{ equipement.nom_equipement }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Aucun équipement trouvé</h3>
+                <p>Commencez par ajouter votre premier équipement dans le parc</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal Ajout -->
+    <div class="modal fade" id="ajoutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus me-2"></i>Ajouter un Équipement
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{{ url_for('ajouter_equipement') }}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nom de l'équipement *</label>
+                            <input type="text" class="form-control" name="nom_equipement" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type *</label>
+                            <select class="form-select" name="type" required>
+                                <option value="">Sélectionner un type</option>
+                                <option value="Serveur">Serveur</option>
+                                <option value="Switch">Switch</option>
+                                <option value="Routeur">Routeur</option>
+                                <option value="PC">PC</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Adresse IP</label>
+                            <input type="text" class="form-control" name="adresse_ip" placeholder="192.168.1.10">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Emplacement</label>
+                            <input type="text" class="form-control" name="emplacement" placeholder="Datacenter A, Bureau 1...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Statut</label>
+                            <select class="form-select" name="statut">
+                                <option value="Actif">Actif</option>
+                                <option value="En Maintenance">En Maintenance</option>
+                                <option value="Hors Service">Hors Service</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Ajouter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Modification -->
+    <div class="modal fade" id="modifModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2"></i>Modifier un Équipement
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" id="modifForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="modifId">
+                        <div class="mb-3">
+                            <label class="form-label">Nom de l'équipement *</label>
+                            <input type="text" class="form-control" name="nom_equipement" id="modifNom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type *</label>
+                            <select class="form-select" name="type" id="modifType" required>
+                                <option value="">Sélectionner un type</option>
+                                <option value="Serveur">Serveur</option>
+                                <option value="Switch">Switch</option>
+                                <option value="Routeur">Routeur</option>
+                                <option value="PC">PC</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Adresse IP</label>
+                            <input type="text" class="form-control" name="adresse_ip" id="modifIP">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Emplacement</label>
+                            <input type="text" class="form-control" name="emplacement" id="modifEmplacement">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Statut</label>
+                            <select class="form-select" name="statut" id="modifStatut">
+                                <option value="Actif">Actif</option>
+                                <option value="En Maintenance">En Maintenance</option>
+                                <option value="Hors Service">Hors Service</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Modifier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <p class="footer-text">
+                NetDB-RK | Gestion de Parc Centralisée | Architecture Microservices | CI/CD GitHub Actions | Dockerized
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Messages Flash - Simple approach without Jinja2 in JS
+        function showNotification(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const alert = `
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 9999;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', alert);
+            
+            setTimeout(() => {
+                const alertElement = document.querySelector('.alert');
+                if (alertElement) {
+                    alertElement.remove();
+                }
+            }, 5000);
+        }
+
+        function modifierEquipement(id) {
+            fetch(`/modifier/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('modifId').value = data.id;
+                    document.getElementById('modifNom').value = data.nom_equipement;
+                    document.getElementById('modifType').value = data.type;
+                    document.getElementById('modifIP').value = data.adresse_ip || '';
+                    document.getElementById('modifEmplacement').value = data.emplacement || '';
+                    document.getElementById('modifStatut').value = data.statut;
+                    
+                    document.getElementById('modifForm').action = `/modifier/${id}`;
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('modifModal'));
+                    modal.show();
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    showNotification('Erreur lors de la récupération des données', 'error');
+                });
+        }
+
+        function supprimerEquipement(id, nom) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer l\'équipement "' + nom + '" ?')) {
+                window.location.href = `/supprimer/${id}`;
+            }
+        }
+
+        function updateStatistics() {
+            const rows = document.querySelectorAll('.equipement-row');
+            let actifs = 0, maintenance = 0, horsService = 0;
+            
+            rows.forEach(row => {
+                const badge = row.querySelector('.badge-status');
+                if (badge.textContent.includes('Actif')) actifs++;
+                else if (badge.textContent.includes('Maintenance')) maintenance++;
+                else if (badge.textContent.includes('Hors Service')) horsService++;
+            });
+            
+            document.getElementById('totalEquipements').textContent = rows.length;
+            document.getElementById('actifsCount').textContent = actifs;
+            document.getElementById('maintenanceCount').textContent = maintenance;
+            document.getElementById('horsServiceCount').textContent = horsService;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatistics();
+        });
+    </script>
+</body>
+</html>
